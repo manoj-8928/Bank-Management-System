@@ -1,0 +1,109 @@
+
+package bank.management.system;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
+import java.util.Date;
+
+public class FastCash extends JFrame implements ActionListener{
+    
+    JButton deposit,cashwithdraw,fastcash,ministatement,pinchange,balance,exit;
+    String cardnumber1;
+    FastCash(String cardnumber1){
+     
+       this.cardnumber1 = cardnumber1;
+        
+        ImageIcon ic1 = new ImageIcon(ClassLoader.getSystemResource("icons/atm.jpg"));
+        Image i1 = ic1.getImage().getScaledInstance(900,800,Image.SCALE_DEFAULT);
+        ImageIcon ic2 = new ImageIcon(i1);
+        JLabel image = new JLabel(ic2);
+        image.setBounds(0,0,900,800);
+        add(image);
+        
+        JLabel text = new JLabel("Select WithDrawal Amount");
+        text.setBounds(210,250,700,35);
+        text.setForeground(Color.WHITE);
+        text.setFont(new Font("Raleway",Font.BOLD,16));
+        image.add(text);
+        
+         deposit = new JButton("Rs100");
+        deposit.setBounds(200,300,100,20);
+        deposit.addActionListener(this);
+        image.add(deposit);
+        
+         cashwithdraw = new JButton("Rs 500");
+        cashwithdraw.setBounds(350,300,150,20);
+        cashwithdraw.addActionListener(this);
+        image.add(cashwithdraw);
+        
+         fastcash = new JButton("Rs 1000");
+        fastcash.setBounds(200,350,100,20);
+        fastcash.addActionListener(this);
+        image.add(fastcash);
+        
+         ministatement = new JButton("Rs 2000");
+        ministatement.setBounds(350,350,150,20);
+        ministatement.addActionListener(this);
+        image.add(ministatement);
+        
+         pinchange = new JButton("Rs 5000");
+        pinchange.setBounds(200,400,100,20);
+        pinchange.addActionListener(this);
+        image.add(pinchange);
+        
+         balance = new JButton("10000");
+        balance.setBounds(350,400,150,20);
+        balance.addActionListener(this);
+        image.add(balance);
+        
+         exit = new JButton("Back");
+        exit.setBounds(350,450,150,20);
+        exit.addActionListener(this);
+        image.add(exit);
+        
+        setSize(900,800);
+        setLocation(300,0);
+          setLayout(null);
+        setVisible(true);
+             
+    }
+    
+    public void actionPerformed(ActionEvent ae){
+        if(ae.getSource()==exit){
+            setVisible(false);
+            new Transactions(cardnumber1).setVisible(true);
+        }else {
+            String amount = ((JButton)ae.getSource()).getText().substring(2).trim();
+            Conn c = new Conn();
+            try{
+                ResultSet rs = c.s.executeQuery("select * from bank where cardnumber = '"+cardnumber1+"'");
+                int balance = 0;
+                while(rs.next()){
+                    if(rs.getString("type").equals("Deposit")){
+                        balance += Integer.parseInt(rs.getString("amount"));
+                    }else{
+                        balance -= Integer.parseInt(rs.getString("amount"));
+                    }
+                }
+                if(ae.getSource() != exit && balance < Integer.parseInt(amount)){
+                    JOptionPane.showMessageDialog(null,"Insufficent Balance");
+                    return;
+                }
+                Date date = new Date();
+                String query = "insert into bank values('"+cardnumber1+"','"+date+"','WITHDRAWAL','"+amount+"')";
+                c.s.executeUpdate(query);
+                JOptionPane.showMessageDialog(null,"Rs. "+amount+" Debited Successfully");
+                setVisible(false);
+                new Transactions(cardnumber1).setVisible(true);
+            }
+            catch(Exception e){
+                System.out.println(e);
+            }
+                }
+    }
+    public static void main(String args[]){
+  new FastCash("");
+}
+}
