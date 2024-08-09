@@ -1,0 +1,92 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package bank.management.system;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+//import java.text.SimpleDateFormat;
+
+
+/**
+ *
+ * @author 91892
+ */
+public class WithDrawal extends JFrame implements ActionListener{
+    
+    JButton withdrawal,back;
+    JTextField amount;
+    String cardnumber1;
+    
+    WithDrawal(String cardnumber1){
+        
+        this.cardnumber1 = cardnumber1;
+        
+        ImageIcon ic1 = new ImageIcon(ClassLoader.getSystemResource("icons/atm.jpg"));
+        Image i1 = ic1.getImage().getScaledInstance(900, 800, Image.SCALE_DEFAULT);
+        ImageIcon ic2 = new ImageIcon(i1);
+        JLabel image = new JLabel(ic2);
+        image.setBounds(0,0,900,800);
+        add(image);
+        
+        JLabel deposit1 = new JLabel("Enter the amount you want to withdraw");
+        deposit1.setFont(new Font("Raleway",Font.BOLD,16));
+        deposit1.setForeground(Color.white);
+        deposit1.setBounds(170,250,350,30);
+        image.add(deposit1);
+        
+         amount = new JTextField();
+        amount.setBounds(170,300,290,25);
+        amount.setFont(new Font("Raleway",Font.BOLD,16));
+        image.add(amount);
+        
+         withdrawal = new JButton("WithDrawal");
+        withdrawal.setBounds(340,400,150,25);
+        withdrawal.addActionListener(this);
+        image.add(withdrawal);
+        
+         back = new JButton("Back");
+        back.setBounds(340,430,150,25);
+        back.addActionListener(this);
+        image.add(back);
+        
+        setLocation(300,0);
+        setSize(900,800);
+        setVisible(true);
+        setLayout(null);
+    }
+    public void actionPerformed(ActionEvent ae){
+        if(ae.getSource() == withdrawal){
+            String number = amount.getText();
+            Date date = new Date();
+            
+            
+            if(number.equals("")){
+                JOptionPane.showMessageDialog(null, "Please enter the amount");
+            }else {
+                try{
+                Conn c = new Conn();
+                String query = "INSERT INTO bank VALUES ('"+cardnumber1+"','"+date+"', 'WithDrawal', '"+number+"')";
+                c.s.execute(query);
+                JOptionPane.showMessageDialog(null,"Rs "+number+ " withdrawal successfully");
+                setVisible(false);
+                new Transactions(cardnumber1).setVisible(true);
+                }
+                catch(Exception e){
+                    System.out.println(e);  
+                }
+            }
+            
+        }else if(ae.getSource() == back){
+            setVisible(false);
+            new Transactions(cardnumber1).setVisible(true);
+        }
+    }
+    public static void main(String args[]){
+        new WithDrawal("");
+    }
+    
+}
